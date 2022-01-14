@@ -22,12 +22,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/The-DTS-Development/djs-handler.git"
+    "url": "git+https://github.com/Tirupatibalaji-Dev/djs-handler.git"
   },
   "bugs": {
-    "url": "https://github.com/The-DTS-Development/djs-handler/issues"
+    "url": "https://github.com/Tirupatibalaji-Dev/djs-handler/issues"
   },
-  "homepage": "https://github.com/The-DTS-Development/djs-handler#readme",
+  "homepage": "https://github.com/Tirupatibalaji-Dev/djs-handler#readme",
   "dependencies": {
     "@discordjs/builders": "^0.11.0",
     "discord-api-types": "^0.26.1",
