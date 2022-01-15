@@ -61,7 +61,6 @@ var events_1 = require("events");
 var discord_js_1 = require("discord.js");
 var handlerOptions_1 = __importDefault(require("./handlerOptions"));
 var interaction_1 = __importDefault(require("./interaction"));
-var path_1 = __importDefault(require("path"));
 var Handler = /** @class */ (function (_super) {
     __extends(Handler, _super);
     function Handler(client, options) {
@@ -85,7 +84,7 @@ var Handler = /** @class */ (function (_super) {
             var _this = this;
             return __generator(this, function (_a) {
                 try {
-                    commandFolderPath_1 = path_1.default.join(__dirname, this.options.commandFolder);
+                    commandFolderPath_1 = this.options.commandFolder;
                     console.log(commandFolderPath_1);
                     (0, fs_1.readdirSync)(commandFolderPath_1).forEach(function (dir) {
                         var commands = (0, fs_1.readdirSync)("".concat(commandFolderPath_1, "/").concat(dir)).filter(function (file) { return file.endsWith(".ts"); });
@@ -129,15 +128,29 @@ var Handler = /** @class */ (function (_super) {
                                             });
                                         });
                             }
+                            if (_this.client.isReady() === true) {
+                                _this.client.slashCommands.set(command.name, command);
+                            }
+                            else {
+                                _this.client.once('ready', function () {
+                                    _this.client.slashCommands.set(command.name, command);
+                                });
+                            }
                             allCommands.push(sub.toJSON());
-                            _this.client.slashCommands.set(command.name, command);
                         };
                         for (var _i = 0, commands_1 = commands; _i < commands_1.length; _i++) {
                             var file = commands_1[_i];
                             _loop_1(file);
                         }
                     });
-                    this.client.allCommands.set('slashCommands', allCommands);
+                    if (this.client.isReady() === true) {
+                        this.client.allCommands.set('slashCommands', allCommands);
+                    }
+                    else {
+                        this.client.once('ready', function () {
+                            _this.client.allCommands.set('slashCommands', allCommands);
+                        });
+                    }
                     resolve(allCommands);
                 }
                 catch (error) {

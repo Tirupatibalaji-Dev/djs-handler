@@ -32,3 +32,4 @@ export default <ag>(interaction: any) : ag => {
 
     return interaction;
 }
+

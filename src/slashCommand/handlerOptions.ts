@@ -5,10 +5,11 @@ class HandlerOptions {
     // eventFolderPath: string;
     // ownerId: string;
 
-    constructor (
+    constructor(
         options: HandlerOptions
     ) {
-        this.commandFolder = options.commandFolder;
+        const main = require.main;
+        this.commandFolder = `${main?.path}/${options.commandFolder}`;
         this.registerCommands = options.registerCommands;
         this.deferReply = options.deferReply;
         // this.eventFolderPath = options.eventFolderPath;

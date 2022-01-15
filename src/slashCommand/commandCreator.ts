@@ -2,13 +2,12 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types';
 import { readdirSync } from 'fs';
 import { EventEmitter } from 'events';
-import { Command } from '../interfaces';
+import { Command } from '../interfaces.d';
 import { Collection, CommandInteraction } from 'discord.js';
 import HandlerOptions from './handlerOptions';
 import Options from './handlerOptions';
 import client from './Client';
 import _interaction from './interaction';
-import path from 'path';
 
 export class Handler extends EventEmitter {
     client: client;
@@ -35,7 +34,7 @@ export class Handler extends EventEmitter {
 
         return new Promise(async (resolve, reject) => {
             try {
-                const commandFolderPath = path.join(__dirname, this.options.commandFolder);
+                const commandFolderPath = this.options.commandFolder;
                 console.log(commandFolderPath)
                 readdirSync(commandFolderPath).forEach((dir) => {
                     const commands = readdirSync(`${commandFolderPath}/${dir}`).filter(file => file.endsWith(".ts"));
@@ -84,12 +83,24 @@ export class Handler extends EventEmitter {
                                         })
                                     })
                         }
-
+                        if (this.client.isReady() === true) {
+                            this.client.slashCommands.set(command.name, command);
+                        } else {
+                            this.client.once('ready', () => {
+                                this.client.slashCommands.set(command.name, command);
+                            })
+                        }
                         allCommands.push(sub.toJSON())
-                        this.client.slashCommands.set(command.name, command);
                     }
                 })
-                this.client.allCommands.set('slashCommands', allCommands);
+
+                if (this.client.isReady() === true) {
+                    this.client.allCommands.set('slashCommands', allCommands);
+                } else {
+                    this.client.once('ready', () => {
+                        this.client.allCommands.set('slashCommands', allCommands);
+                    })
+                }
                 resolve(allCommands)
             } catch (error) {
                 reject(error);

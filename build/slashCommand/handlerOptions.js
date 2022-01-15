@@ -4,7 +4,8 @@ var HandlerOptions = /** @class */ (function () {
     // eventFolderPath: string;
     // ownerId: string;
     function HandlerOptions(options) {
-        this.commandFolder = options.commandFolder;
+        var main = require.main;
+        this.commandFolder = "".concat(main === null || main === void 0 ? void 0 : main.path, "/").concat(options.commandFolder);
         this.registerCommands = options.registerCommands;
         this.deferReply = options.deferReply;
         // this.eventFolderPath = options.eventFolderPath;
