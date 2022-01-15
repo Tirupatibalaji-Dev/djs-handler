@@ -93,41 +93,41 @@ var Handler = /** @class */ (function (_super) {
                             var sub = new builders_1.SlashCommandBuilder();
                             sub.setName(command.name);
                             sub.setDescription(command.description);
-                            if (command.options)
-                                if (command.options.length > 0)
-                                    command.options.forEach(function (option) {
-                                        if (option.user)
-                                            if (option.user.length > 0)
-                                                option.user.forEach(function (user) {
-                                                    sub.addUserOption(function (userOption) { return userOption.setName(user.name).setDescription(user.description).setRequired(user.required); });
-                                                });
-                                        if (option.role)
-                                            if (option.role.length > 0)
-                                                option.role.forEach(function (role) {
-                                                    sub.addRoleOption(function (roleOption) { return roleOption.setName(role.name).setDescription(role.description).setRequired(role.required); });
-                                                });
-                                        if (option.channel)
-                                            if (option.channel.length > 0)
-                                                option.channel.forEach(function (channel) {
-                                                    sub.addChannelOption(function (channelOption) {
-                                                        channelOption.setName(channel.name).setDescription(channel.description).setRequired(channel.required);
-                                                        return channelOption;
-                                                    });
-                                                });
-                                        if (option.string)
-                                            if (option.string.length > 0)
-                                                option.string.forEach(function (optionString) {
-                                                    sub.addStringOption(function (stringOption) {
-                                                        stringOption.setName(optionString.name).setDescription(optionString.description).setRequired(optionString.required).setAutocomplete(optionString.autocomplete);
-                                                        if (optionString.choices)
-                                                            if (optionString.choices.length > 0)
-                                                                optionString.choices.forEach(function (choices) {
-                                                                    stringOption.addChoice(String(choices.name), String(choices.value));
-                                                                });
-                                                        return stringOption;
-                                                    });
-                                                });
-                                    });
+                            if (command.options) {
+                                if (command.options.user)
+                                    if (command.options.user.length > 0)
+                                        command.options.user.forEach(function (user) {
+                                            sub.addUserOption(function (userOption) { return userOption.setName(user.name).setDescription(user.description).setRequired(user.required); });
+                                        });
+                                if (command.options.role)
+                                    if (command.options.role.length > 0)
+                                        command.options.role.forEach(function (role) {
+                                            sub.addRoleOption(function (roleOption) { return roleOption.setName(role.name).setDescription(role.description).setRequired(role.required); });
+                                        });
+                                if (command.options.channel)
+                                    if (command.options.channel.length > 0)
+                                        command.options.channel.forEach(function (channel) {
+                                            sub.addChannelOption(function (channelOption) {
+                                                channelOption.setName(channel.name).setDescription(channel.description).setRequired(channel.required);
+                                                return channelOption;
+                                            });
+                                        });
+                                if (command.options.string)
+                                    if (command.options.string.length > 0)
+                                        command.options.string.forEach(function (optionString) {
+                                            sub.addStringOption(function (stringOption) {
+                                                stringOption.setName(optionString.name).setDescription(optionString.description).setRequired(optionString.required);
+                                                if (optionString.autocomplete)
+                                                    stringOption.setAutocomplete(optionString.autocomplete);
+                                                if (optionString.choices)
+                                                    if (optionString.choices.length > 0)
+                                                        optionString.choices.forEach(function (choices) {
+                                                            stringOption.addChoice(String(choices.name), String(choices.value));
+                                                        });
+                                                return stringOption;
+                                            });
+                                        });
+                            }
                             allCommands.push(sub.toJSON());
                             _this.client.slashCommands.set(command.name, command);
                         };

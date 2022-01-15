@@ -2,7 +2,7 @@
   "name": "@dtsjs/djs-handler",
   "version": "1.0.2",
   "description": "manage your slash command easily with djs cmd handler",
-  "main": "index.js",
+  "main": "build/index.js",
   "typings": "src/",
   "scripts": {
     "test": "echo \"No test specified\"",

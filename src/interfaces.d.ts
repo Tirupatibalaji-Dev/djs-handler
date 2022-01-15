@@ -26,11 +26,11 @@ export interface Command {
     requiredroles?: string[],
     alloweduserids?: string[],
     options?: {
-        string?: { name: string, description: string, required: false, autocomplete: boolean, choices?: { name: string, value: string }[] }[],
+        string?: { name: string, description: string, required: false, autocomplete?: boolean, choices?: { name: string, value: string }[] }[],
         user?: { name: string, description: string, required: false }[],
         role?: { name: string, description: string, required: false }[],
         channel?: { name: string, description: string, required: false, channelType?: Channel_Type }[]
-    }[],
+    },
     default_permission?: null,
 
     run: Run;

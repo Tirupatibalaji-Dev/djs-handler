@@ -44,46 +44,47 @@ export class Handler extends EventEmitter {
                         const sub = new SlashCommandBuilder()
                         sub.setName(command.name)
                         sub.setDescription(command.description);
-                        if (command.options)
-                            if (command.options.length > 0)
-                                command.options.forEach((option) => {
-                                    if (option.user)
-                                        if (option.user.length > 0)
-                                            option.user.forEach((user) => {
-                                                sub.addUserOption(userOption => userOption.setName(user.name).setDescription(user.description).setRequired(user.required))
-                                            });
+                        if (command.options) {
+                            if (command.options.user)
+                                if (command.options.user.length > 0)
+                                    command.options.user.forEach((user) => {
+                                        sub.addUserOption(userOption => userOption.setName(user.name).setDescription(user.description).setRequired(user.required))
+                                    });
 
-                                    if (option.role)
-                                        if (option.role.length > 0)
-                                            option.role.forEach((role) => {
-                                                sub.addRoleOption(roleOption => roleOption.setName(role.name).setDescription(role.description).setRequired(role.required))
-                                            });
+                            if (command.options.role)
+                                if (command.options.role.length > 0)
+                                    command.options.role.forEach((role) => {
+                                        sub.addRoleOption(roleOption => roleOption.setName(role.name).setDescription(role.description).setRequired(role.required))
+                                    });
 
-                                    if (option.channel)
-                                        if (option.channel.length > 0)
-                                            option.channel.forEach((channel) => {
+                            if (command.options.channel)
+                                if (command.options.channel.length > 0)
+                                    command.options.channel.forEach((channel) => {
 
-                                                sub.addChannelOption(channelOption => {
+                                        sub.addChannelOption(channelOption => {
 
-                                                    channelOption.setName(channel.name).setDescription(channel.description).setRequired(channel.required);
-                                                    return channelOption
+                                            channelOption.setName(channel.name).setDescription(channel.description).setRequired(channel.required);
+                                            return channelOption
 
-                                                })
-                                            });
-                                    if (option.string)
-                                        if (option.string.length > 0)
-                                            option.string.forEach((optionString) => {
-                                                sub.addStringOption((stringOption) => {
-                                                    stringOption.setName(optionString.name).setDescription(optionString.description).setRequired(optionString.required).setAutocomplete(optionString.autocomplete)
-                                                    if (optionString.choices)
-                                                        if (optionString.choices.length > 0)
-                                                            optionString.choices.forEach(choices => {
-                                                                stringOption.addChoice(String(choices.name), String(choices.value))
-                                                            });
-                                                    return stringOption;
-                                                })
-                                            })
-                                })
+                                        })
+                                    });
+                            if (command.options.string)
+                                if (command.options.string.length > 0)
+                                    command.options.string.forEach((optionString) => {
+                                        sub.addStringOption((stringOption) => {
+                                            stringOption.setName(optionString.name).setDescription(optionString.description).setRequired(optionString.required)
+                                            if (optionString.autocomplete)
+                                                stringOption.setAutocomplete(optionString.autocomplete)
+                                            if (optionString.choices)
+                                                if (optionString.choices.length > 0)
+                                                    optionString.choices.forEach(choices => {
+                                                        stringOption.addChoice(String(choices.name), String(choices.value))
+                                                    });
+                                            return stringOption;
+                                        })
+                                    })
+                        }
+
                         allCommands.push(sub.toJSON())
                         this.client.slashCommands.set(command.name, command);
                     }
@@ -115,8 +116,8 @@ export class Handler extends EventEmitter {
             if (!command || !member) return;
 
             const int = _interaction<CommandInteraction>(interaction);
-            
-            if(this.options.deferReply === true) await interaction.deferReply();
+
+            if (this.options.deferReply === true) await interaction.deferReply();
 
             try {
                 command.run(this.client, int)
