@@ -23,7 +23,8 @@ export class Handler extends EventEmitter {
 
 
         this.loadCommands().then(() => {
-            if (options.registerCommands) this.registerSlashCommands();
+            const guilds = this.options.guilds ? this.options.guilds : [];
+            if (options.registerCommands) this.registerSlashCommands(guilds);
 
             this.handleSlashCommands();
         })
@@ -116,7 +117,9 @@ export class Handler extends EventEmitter {
                     this.client.application?.commands.set(commands, guild);
                 })
             else
-                this.client.application?.commands.set(commands);
+                this.client.application?.commands.set(commands).then(() => {
+                    console.log('Slash commands registered')
+                })
     }
 
     async handleSlashCommands() {
