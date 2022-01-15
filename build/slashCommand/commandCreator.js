@@ -70,8 +70,9 @@ var Handler = /** @class */ (function (_super) {
         _this.client.slashCommands = new discord_js_1.Collection();
         _this.client.allCommands = new discord_js_1.Collection();
         _this.loadCommands().then(function () {
+            var guilds = _this.options.guilds ? _this.options.guilds : [];
             if (options.registerCommands)
-                _this.registerSlashCommands();
+                _this.registerSlashCommands(guilds);
             _this.handleSlashCommands();
         });
         return _this;
@@ -174,7 +175,9 @@ var Handler = /** @class */ (function (_super) {
                             (_a = _this.client.application) === null || _a === void 0 ? void 0 : _a.commands.set(commands, guild);
                         });
                     else
-                        (_a = this.client.application) === null || _a === void 0 ? void 0 : _a.commands.set(commands);
+                        (_a = this.client.application) === null || _a === void 0 ? void 0 : _a.commands.set(commands).then(function () {
+                            console.log('Slash commands registered');
+                        });
                 return [2 /*return*/];
             });
         });

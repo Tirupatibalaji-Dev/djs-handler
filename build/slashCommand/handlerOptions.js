@@ -8,6 +8,7 @@ var HandlerOptions = /** @class */ (function () {
         this.commandFolder = "".concat(main === null || main === void 0 ? void 0 : main.path, "/").concat(options.commandFolder);
         this.registerCommands = options.registerCommands;
         this.deferReply = options.deferReply;
+        this.guilds = options.guilds;
         // this.eventFolderPath = options.eventFolderPath;
         // this.ownerId = options.ownerId;
     }
