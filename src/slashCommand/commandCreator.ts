@@ -35,7 +35,7 @@ export class Handler extends EventEmitter {
 
         return new Promise(async (resolve, reject) => {
             try {
-                const commandFolderPath = this.options.commandFolder;
+                const commandFolderPath = path.join(__dirname, this.options.commandFolder);
                 console.log(commandFolderPath)
                 readdirSync(commandFolderPath).forEach((dir) => {
                     const commands = readdirSync(`${commandFolderPath}/${dir}`).filter(file => file.endsWith(".ts"));

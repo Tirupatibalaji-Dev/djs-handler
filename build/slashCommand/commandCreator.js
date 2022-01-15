@@ -61,6 +61,7 @@ var events_1 = require("events");
 var discord_js_1 = require("discord.js");
 var handlerOptions_1 = __importDefault(require("./handlerOptions"));
 var interaction_1 = __importDefault(require("./interaction"));
+var path_1 = __importDefault(require("path"));
 var Handler = /** @class */ (function (_super) {
     __extends(Handler, _super);
     function Handler(client, options) {
@@ -84,7 +85,7 @@ var Handler = /** @class */ (function (_super) {
             var _this = this;
             return __generator(this, function (_a) {
                 try {
-                    commandFolderPath_1 = this.options.commandFolder;
+                    commandFolderPath_1 = path_1.default.join(__dirname, this.options.commandFolder);
                     console.log(commandFolderPath_1);
                     (0, fs_1.readdirSync)(commandFolderPath_1).forEach(function (dir) {
                         var commands = (0, fs_1.readdirSync)("".concat(commandFolderPath_1, "/").concat(dir)).filter(function (file) { return file.endsWith(".ts"); });
