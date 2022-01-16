@@ -1,97 +1,67 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { Command, HandlerOptions } from './handler.interfaces';
 import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types';
 import { readdirSync } from 'fs';
-import { EventEmitter } from 'events';
-import { Command } from '../interfaces.d';
-import { Collection, CommandInteraction } from 'discord.js';
-import HandlerOptions from './handlerOptions';
-import Options from './handlerOptions';
+import { Collection } from 'discord.js';
 import client from './Client';
-import _interaction from './interaction';
+import Utils from './utils';
 
-export class Handler extends EventEmitter {
+export class Handler {
     client: client;
-    options: HandlerOptions;
+    public options: HandlerOptions;
 
+    /**
+     * @name Handler
+     * @kind constructor
+     * @description Initializing the giveaway client
+     * @param client - The Discord client instance
+     * @param options - The options for the Handler
+     */
     constructor(client: client, options: HandlerOptions) {
-        super();
         this.client = client;
-        this.options = new Options(options);
+
+        const { commandFolder, registerCommands, deferReply, guilds } = options;
 
         this.client.slashCommands = new Collection();
         this.client.allCommands = new Collection();
 
+        this.options = {
+            commandFolder,
+            registerCommands: registerCommands || false,
+            deferReply: deferReply || false,
+            guilds: guilds || []
+        }
+
 
         this.loadCommands().then(() => {
-            const guilds = this.options.guilds ? this.options.guilds : [];
-            if (options.registerCommands) this.registerSlashCommands(guilds);
-
+            if (options.registerCommands) this.registerSlashCommands();
             this.handleSlashCommands();
         })
     }
 
-    loadCommands() {
+    /**
+     * @description Loads all commands from the command directory
+     */
+    private loadCommands() {
         let allCommands: RESTPostAPIApplicationCommandsJSONBody[] = []
 
         return new Promise(async (resolve, reject) => {
             try {
                 const commandFolderPath = this.options.commandFolder;
-                console.log(commandFolderPath)
                 readdirSync(commandFolderPath).forEach((dir) => {
-                    const commands = readdirSync(`${commandFolderPath}/${dir}`).filter(file => file.endsWith(".ts"));
+                    const commands = readdirSync(`${commandFolderPath}/${dir}`).filter(file => file.endsWith(".js") || file.endsWith(".ts"));
                     for (const file of commands) {
-                        const command: Command = require(`${commandFolderPath}/${dir}/${file}`).command;
-                        const sub = new SlashCommandBuilder()
-                        sub.setName(command.name)
-                        sub.setDescription(command.description);
-                        if (command.options) {
-                            if (command.options.user)
-                                if (command.options.user.length > 0)
-                                    command.options.user.forEach((user) => {
-                                        sub.addUserOption(userOption => userOption.setName(user.name).setDescription(user.description).setRequired(user.required))
-                                    });
+                        const command: Command = require(`${commandFolderPath}/${dir}/${file}`);
 
-                            if (command.options.role)
-                                if (command.options.role.length > 0)
-                                    command.options.role.forEach((role) => {
-                                        sub.addRoleOption(roleOption => roleOption.setName(role.name).setDescription(role.description).setRequired(role.required))
-                                    });
+                        const cmd = Utils.fixCommand(command);
 
-                            if (command.options.channel)
-                                if (command.options.channel.length > 0)
-                                    command.options.channel.forEach((channel) => {
-
-                                        sub.addChannelOption(channelOption => {
-
-                                            channelOption.setName(channel.name).setDescription(channel.description).setRequired(channel.required);
-                                            return channelOption
-
-                                        })
-                                    });
-                            if (command.options.string)
-                                if (command.options.string.length > 0)
-                                    command.options.string.forEach((optionString) => {
-                                        sub.addStringOption((stringOption) => {
-                                            stringOption.setName(optionString.name).setDescription(optionString.description).setRequired(optionString.required)
-                                            if (optionString.autocomplete)
-                                                stringOption.setAutocomplete(optionString.autocomplete)
-                                            if (optionString.choices)
-                                                if (optionString.choices.length > 0)
-                                                    optionString.choices.forEach(choices => {
-                                                        stringOption.addChoice(String(choices.name), String(choices.value))
-                                                    });
-                                            return stringOption;
-                                        })
-                                    })
-                        }
                         if (this.client.isReady() === true) {
-                            this.client.slashCommands.set(command.name, command);
+                            this.client.slashCommands.set(cmd.name, cmd);
                         } else {
                             this.client.once('ready', () => {
-                                this.client.slashCommands.set(command.name, command);
+                                this.client.slashCommands.set(cmd.name, cmd);
                             })
                         }
-                        allCommands.push(sub.toJSON())
+                        allCommands.push(cmd)
                     }
                 })
 
@@ -103,41 +73,45 @@ export class Handler extends EventEmitter {
                     })
                 }
                 resolve(allCommands)
+                return Handler
             } catch (error) {
                 reject(error);
             }
         })
     }
 
-    async registerSlashCommands(guilds?: string[]) {
+    private async registerSlashCommands() {
         const commands = this.client.allCommands.get('slashCommands');
-        if (commands)
-            if (guilds)
-                guilds.forEach(guild => {
-                    this.client.application?.commands.set(commands, guild);
-                })
-            else
-                this.client.application?.commands.set(commands).then(() => {
-                    console.log('Slash commands registered')
-                })
+        if (!commands) return;
+        if (this.options.guilds) this.options.guilds.forEach(g => this.client.application?.commands.set(commands, g))
+        else this.client.application?.commands.set(commands)
     }
 
-    async handleSlashCommands() {
+    private async handleSlashCommands() {
         this.client.on('interactionCreate', async (interaction) => {
             if (!interaction.isCommand()) return;
             const command = this.client.slashCommands.get(interaction.commandName);
             const member = interaction.guild?.members.cache.get(interaction.user.id);
             if (!command || !member) return;
 
-            const int = _interaction<CommandInteraction>(interaction);
-
             if (this.options.deferReply === true) await interaction.deferReply();
-
             try {
-                command.run(this.client, int)
+                command.run(this.client, interaction)
             } catch {
                 console.error()
             }
+        })
+    }
+
+    /**
+     * reloadCommands
+     * @description Reloads all commands
+     * @memberof Handler
+     * @example Handler.reloadCommands()
+     */
+    public reloadCommands() {
+        this.loadCommands().then(() => {
+            this.registerSlashCommands();
         })
     }
 }

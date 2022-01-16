@@ -1,6 +1,6 @@
-import { Command } from '../interfaces';
-import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/rest/v9';
-import { ApplicationCommandDataResolvable, Client, ClientOptions, Collection } from 'discord.js';
+import { Command } from './handler.interfaces';
+import {  Client, ClientOptions, Collection } from 'discord.js';
+import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
 
 class client extends Client {
     slashCommands: Collection<string, Command>;

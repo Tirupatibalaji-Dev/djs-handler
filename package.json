@@ -6,10 +6,7 @@
   "typings": "src/",
   "scripts": {
     "test": "echo \"No test specified\"",
-    "start:dev": "nodemon",
-    "start": "npm run build && node build/index.js",
-    "dev": "nodemon --exec \"ts-node\" --cache-directory .tscache ./test.ts",
-    "build": "rimraf ./build && tsc"
+    "build": "npx tsc"
   },
   "author": "Tirupatibalaji-Dev",
   "license": "ISC",
@@ -32,6 +29,7 @@
     "@discordjs/builders": "^0.11.0",
     "discord-api-types": "^0.26.1",
     "discord.js": "^13.5.1",
-    "events": "^3.3.0"
+    "events": "^3.3.0",
+    "typedoc": "^0.22.10"
   }
 }
